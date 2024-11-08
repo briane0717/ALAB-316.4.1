@@ -21,11 +21,14 @@ function validate(evt) {
   if (emailVal === false) {
     return false;
   }
+  const passwordVal = validatePassword();
+  if (passwordVal === false) {
+    return false;
+  }
 
   alert(`Name: ${nameVal}
         Email: ${emailVal}
         Password: ...that's a secret`);
-
   return true;
 }
 
@@ -37,7 +40,6 @@ function validateName() {
     uName.focus();
     return false;
   }
-
   // Check if name contains only alphanumeric characters (no special characters or whitespace)
   const isValid = /^[a-zA-Z0-9]+$/.test(nameVal);
   console.log("Regex test result:", isValid); // Debugging log
@@ -64,7 +66,6 @@ function validateEmail() {
   const excludedDomains = ["example.com"];
   const atpos = emailVal.indexOf("@");
   const dotpos = emailVal.lastIndexOf(".");
-
   //checks domain name after @
   const domain = emailVal.split("@")[1];
   if (excludedDomains.includes(domain)) {
@@ -86,13 +87,21 @@ function validateEmail() {
     email.focus();
     return false;
   }
-
   if (emailVal === "domain.com") {
     email.split("@");
     alert("Invalid Email");
     email.focus();
     return false;
   }
-
   return emailVal;
+}
+
+function validatePassword() {
+  let passwordVal = password.value;
+  if (passwordVal.length < 12) {
+    alert("Password must be at least twelve characters long.");
+    password.focus();
+    return false;
+  }
+  return passwordVal;
 }
