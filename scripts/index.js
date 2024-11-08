@@ -15,12 +15,12 @@ function validate(evt) {
   if (nameVal === false) {
     return false;
   }
-
   // Simple email validation
   const emailVal = validateEmail();
   if (emailVal === false) {
     return false;
   }
+  // Simple password validation
   const passwordVal = validatePassword();
   if (passwordVal === false) {
     return false;
@@ -103,5 +103,23 @@ function validatePassword() {
     password.focus();
     return false;
   }
+  let hasUpperCase = /[A-Z]/.test(passwordVal);
+  let hasLowerCase = /[a-z]/.test(passwordVal);
+  let hasNumber;
+  let hasSpecialCharacter;
+
+  if (!hasUpperCase || !hasLowerCase) {
+    alert(
+      "Password must be have at least one uppercase and one lowercase letter."
+    );
+    password.focus();
+    return false;
+  }
+  if (!hasNumber) {
+    alert("Password must be have at least one number.");
+    password.focus();
+    return false;
+  }
+
   return passwordVal;
 }
