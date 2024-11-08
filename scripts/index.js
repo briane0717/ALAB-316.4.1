@@ -105,8 +105,8 @@ function validatePassword() {
   }
   let hasUpperCase = /[A-Z]/.test(passwordVal);
   let hasLowerCase = /[a-z]/.test(passwordVal);
-  let hasNumber;
-  let hasSpecialCharacter;
+  let hasNumber = /[0-9]/.test(passwordVal);
+  let hasSpecialCharacter = /[^a-zA-Z0-9]/.test(passwordVal);
 
   if (!hasUpperCase || !hasLowerCase) {
     alert(
@@ -117,6 +117,11 @@ function validatePassword() {
   }
   if (!hasNumber) {
     alert("Password must be have at least one number.");
+    password.focus();
+    return false;
+  }
+  if (!hasSpecialCharacter) {
+    alert("Password must be have at least one special character.");
     password.focus();
     return false;
   }
