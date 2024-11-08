@@ -21,7 +21,7 @@ function validate(evt) {
     return false;
   }
   // Simple password validation
-  const passwordVal = validatePassword();
+  const passwordVal = validatePassword(nameVal);
   if (passwordVal === false) {
     return false;
   }
@@ -96,7 +96,7 @@ function validateEmail() {
   return emailVal;
 }
 
-function validatePassword() {
+function validatePassword(nameVal) {
   let passwordVal = password.value;
   if (passwordVal.length < 12) {
     alert("Password must be at least twelve characters long.");
@@ -132,5 +132,10 @@ function validatePassword() {
     return false;
   }
 
+  if (passwordVal === nameVal) {
+    alert("Password cannot be the same as the username.");
+    password.focus();
+    return false;
+  }
   return passwordVal;
 }
