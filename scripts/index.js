@@ -1,15 +1,25 @@
-console.log("my script is running");
+console.log("My script is running");
 
 const registrationForm = document.getElementById("registration");
-console.log("form");
+const loginForm = document.getElementById("login");
+
+// Registration form elements
 const uName = registrationForm.elements["username"];
 const email = registrationForm.elements["email"];
 const password = registrationForm.elements["password"];
 const passwordCheck = registrationForm.elements["passwordCheck"];
 
-registrationForm.addEventListener("submit", validate);
+// Login form elements
+const loginUser = loginForm.elements["username"];
+const loginPassword = loginForm.elements["password"];
+const keepLoggedIn = loginForm.elements["keepLoggedIn"];
 
-function validate(evt) {
+// Event listeners for form submissions
+registrationForm.addEventListener("submit", validateRegistration);
+loginForm.addEventListener("submit", validateLogin);
+
+// Registration validation
+function validateRegistration(evt) {
   evt.preventDefault();
 
   const nameVal = validateName();
@@ -21,142 +31,164 @@ function validate(evt) {
   const passwordVal = validatePassword(nameVal);
   if (!passwordVal) return false;
 
-  if (localStorage.getItem(nameVal)) {
-    alert("That username is already taken. Please choose another one.");
+  if (localStorage.getItem(nameVal.toLowerCase())) {
+    alert("Username is already taken.");
     uName.focus();
     return false;
+  }
 
- 
+  storeUserData(nameVal, emailVal, passwordVal);
+  clearFormFields();
 }
 
-alert(`Name: ${nameVal}
-        Email: ${emailVal}
-        Password: ...that's a secret`);
-return true;
-
+// Validation helper functions
 function validateName() {
   let nameVal = uName.value.trim().toLowerCase();
-  console.log("Input value (trimmed):", nameVal);
-  if (nameVal.length < 4) {
-    alert("Name must be at least four characters long.");
-    uName.focus();
-    return false;
-  }
-  // Check if name contains only alphanumeric characters (no special characters or whitespace)
-  const isValid = /^[a-zA-Z0-9]+$/.test(nameVal);
-  console.log("Regex test result:", isValid);
-
-  if (!isValid) {
-    alert("The name cannot contain any special characters or whitespace.");
-    uName.focus();
-    return false;
-  }
-  // Check if name contains less than two unique characters
-  const uniqueChars = new Set(nameVal);
-  if (uniqueChars.size < 2) {
-    alert("The username must contain at least two unique characters.");
+  if (!nameVal || nameVal.length < 4) {
+    alert("Username must be at least four characters long.");
     uName.focus();
     return false;
   }
 
-  // Return the valid name if all checks pass
+  if (!/^[a-zA-Z0-9]+$/.test(nameVal)) {
+    alert("Username cannot contain special characters or whitespace.");
+    uName.focus();
+    return false;
+  }
+
+  if (new Set(nameVal).size < 2) {
+    alert("Username must contain at least two unique characters.");
+    uName.focus();
+    return false;
+  }
+
   return nameVal;
 }
-// email validation
+
 function validateEmail() {
-  //converts email to lowercase
-  let emailVal = email.value.trim.toLowerCase();
+  let emailVal = email.value.trim().toLowerCase();
   const excludedDomains = ["example.com"];
+  const domain = emailVal.split("@")[1];
+
+  if (excludedDomains.includes(domain)) {
+    alert("Email cannot be from example.com.");
+    email.focus();
+    return false;
+  }
+
   const atpos = emailVal.indexOf("@");
   const dotpos = emailVal.lastIndexOf(".");
-  //checks domain name after @
-  const domain = emailVal.split("@")[1];
-  if (excludedDomains.includes(domain)) {
-    alert("Email cannot be from example.com");
+  if (atpos < 1 || dotpos - atpos < 2) {
+    alert("Please provide a valid email address.");
     email.focus();
     return false;
   }
-  if (atpos < 1) {
-    alert(
-      "Your email must include an @ symbol, which must not be at the beginning."
-    );
-    email.focus();
-    return false;
-  }
-  if (dotpos - atpos < 2) {
-    alert(
-      "Invalid structure: @. \n You must include a domain name after the @ symbol."
-    );
-    email.focus();
-    return false;
-  }
-  if (emailVal === "domain.com") {
-    email.split("@");
-    alert("Invalid Email");
-    email.focus();
-    return false;
-  }
+
   return emailVal;
 }
 
 function validatePassword(nameVal) {
   let passwordVal = password.value;
-  if (passwordVal.length < 12) {
-    alert("Password must be at least twelve characters long.");
-    password.focus();
-    return false;
-  }
-  let hasUpperCase = /[A-Z]/.test(passwordVal);
-  let hasLowerCase = /[a-z]/.test(passwordVal);
-  let hasNumber = /[0-9]/.test(passwordVal);
-  let hasSpecialCharacter = /[^a-zA-Z0-9]/.test(passwordVal);
-  let containsPassword = /password/i.test(passwordVal);
+  const hasUpperCase = /[A-Z]/.test(passwordVal);
+  const hasLowerCase = /[a-z]/.test(passwordVal);
+  const hasNumber = /[0-9]/.test(passwordVal);
+  const hasSpecialCharacter = /[^a-zA-Z0-9]/.test(passwordVal);
 
-  if (!hasUpperCase || !hasLowerCase) {
+  if (
+    passwordVal.length < 12 ||
+    !hasUpperCase ||
+    !hasLowerCase ||
+    !hasNumber ||
+    !hasSpecialCharacter
+  ) {
     alert(
-      "Password must be have at least one uppercase and one lowercase letter."
+      "Password must be at least 12 characters long, containing uppercase, lowercase, a number, and a special character."
     );
     password.focus();
     return false;
   }
-  if (!hasNumber) {
-    alert("Password must be have at least one number.");
-    password.focus();
-    return false;
-  }
-  if (!hasSpecialCharacter) {
-    alert("Password must be have at least one special character.");
-    password.focus();
-    return false;
-  }
-  if (containsPassword) {
-    alert("Password cannot contain the word password.");
+
+  if (/password/i.test(passwordVal)) {
+    alert("Password cannot contain the word 'password'.");
     password.focus();
     return false;
   }
 
-  if (passwordVal === nameVal) {
-    alert("Password cannot be the same as the username.");
-    password.focus();
-    return false;
-  }
-  if (passwordVal !== passwordCheck.value) {
-    alert("Passwords do not match.");
+  if (passwordVal === nameVal || passwordVal !== passwordCheck.value) {
+    alert(
+      "Password must be different from the username and match the confirmation."
+    );
     passwordCheck.focus();
     return false;
   }
+
   return passwordVal;
-
-  function storeUserData(nameVal, emailVal, passwordVal) {
-    // Store username, email, and password separately
-    localStorage.setItem(nameVal, passwordVal);
-    localStorage.setItem(`${nameVal}_email`, emailVal);
-  }
-
-  function clearFormFields() {
-    uName.value = "";
-    email.value = "";
-    password.value = "";
-    passwordCheck.value = "";
-  }
 }
+
+function storeUserData(nameVal, emailVal, passwordVal) {
+  localStorage.setItem(nameVal.toLowerCase(), passwordVal);
+  localStorage.setItem(`${nameVal}_email`, emailVal);
+}
+
+function clearFormFields() {
+  uName.value = "";
+  email.value = "";
+  password.value = "";
+  passwordCheck.value = "";
+}
+
+// Login validation
+function validateLogin(evt) {
+  evt.preventDefault();
+
+  const usernameVal = validateLoginUsername();
+  if (!usernameVal) return false;
+
+  const passwordVal = validateLoginPassword(usernameVal);
+  if (!passwordVal) return false;
+
+  clearLoginFields();
+  showSuccessMessage();
+}
+
+// Login validation helpers
+function validateLoginUsername() {
+  let usernameVal = loginUser.value.trim();
+  if (!usernameVal || !localStorage.getItem(usernameVal.toLowerCase())) {
+    alert("Username does not exist.");
+    loginUser.focus();
+    return false;
+  }
+
+  return usernameVal;
+}
+
+function validateLoginPassword(usernameVal) {
+  let passwordVal = loginPassword.value.trim();
+  const storedPassword = localStorage.getItem(usernameVal.toLowerCase());
+
+  if (!passwordVal || passwordVal !== storedPassword) {
+    alert("Incorrect password.");
+    loginPassword.focus();
+    return false;
+  }
+
+  return passwordVal;
+}
+
+function showSuccessMessage() {
+  let successMessage = "Login successful!";
+  if (keepLoggedIn.checked) {
+    successMessage += " You will stay logged in.";
+  }
+
+  alert(successMessage);
+}
+
+function clearLoginFields() {
+  loginUser.value = "";
+  loginPassword.value = "";
+  keepLoggedIn.checked = false;
+}
+
+console.log("Login script is running");
