@@ -107,6 +107,7 @@ function validatePassword() {
   let hasLowerCase = /[a-z]/.test(passwordVal);
   let hasNumber = /[0-9]/.test(passwordVal);
   let hasSpecialCharacter = /[^a-zA-Z0-9]/.test(passwordVal);
+  let containsPassword = /password/i.test(passwordVal);
 
   if (!hasUpperCase || !hasLowerCase) {
     alert(
@@ -122,6 +123,11 @@ function validatePassword() {
   }
   if (!hasSpecialCharacter) {
     alert("Password must be have at least one special character.");
+    password.focus();
+    return false;
+  }
+  if (containsPassword) {
+    alert("Password cannot contain the word password.");
     password.focus();
     return false;
   }
