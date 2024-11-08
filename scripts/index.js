@@ -11,29 +11,31 @@ registrationForm.addEventListener("submit", validate);
 
 function validate(evt) {
   evt.preventDefault();
-  const nameVal = validateName();
-  if (nameVal === false) {
-    return false;
-  }
-  // Simple email validation
-  const emailVal = validateEmail();
-  if (emailVal === false) {
-    return false;
-  }
-  // Simple password validation
-  const passwordVal = validatePassword(nameVal);
-  if (passwordVal === false) {
-    return false;
-  }
 
-  alert(`Name: ${nameVal}
-        Email: ${emailVal}
-        Password: ...that's a secret`);
-  return true;
+  const nameVal = validateName();
+  if (!nameVal) return false;
+
+  const emailVal = validateEmail();
+  if (!emailVal) return false;
+
+  const passwordVal = validatePassword(nameVal);
+  if (!passwordVal) return false;
+
+  if (localStorage.getItem(nameVal)) {
+    alert("That username is already taken. Please choose another one.");
+    uName.focus();
+    return false;
+
+ 
 }
 
+alert(`Name: ${nameVal}
+        Email: ${emailVal}
+        Password: ...that's a secret`);
+return true;
+
 function validateName() {
-  let nameVal = uName.value.trim();
+  let nameVal = uName.value.trim().toLowerCase();
   console.log("Input value (trimmed):", nameVal);
   if (nameVal.length < 4) {
     alert("Name must be at least four characters long.");
@@ -42,7 +44,7 @@ function validateName() {
   }
   // Check if name contains only alphanumeric characters (no special characters or whitespace)
   const isValid = /^[a-zA-Z0-9]+$/.test(nameVal);
-  console.log("Regex test result:", isValid); // Debugging log
+  console.log("Regex test result:", isValid);
 
   if (!isValid) {
     alert("The name cannot contain any special characters or whitespace.");
@@ -62,7 +64,8 @@ function validateName() {
 }
 // email validation
 function validateEmail() {
-  let emailVal = email.value;
+  //converts email to lowercase
+  let emailVal = email.value.trim.toLowerCase();
   const excludedDomains = ["example.com"];
   const atpos = emailVal.indexOf("@");
   const dotpos = emailVal.lastIndexOf(".");
@@ -142,6 +145,18 @@ function validatePassword(nameVal) {
     passwordCheck.focus();
     return false;
   }
-
   return passwordVal;
+
+  function storeUserData(nameVal, emailVal, passwordVal) {
+    // Store username, email, and password separately
+    localStorage.setItem(nameVal, passwordVal);
+    localStorage.setItem(`${nameVal}_email`, emailVal);
+  }
+
+  function clearFormFields() {
+    uName.value = "";
+    email.value = "";
+    password.value = "";
+    passwordCheck.value = "";
+  }
 }
