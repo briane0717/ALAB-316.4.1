@@ -137,5 +137,11 @@ function validatePassword(nameVal) {
     password.focus();
     return false;
   }
+  if (passwordVal !== passwordCheck.value) {
+    alert("Passwords do not match.");
+    passwordCheck.focus();
+    return false;
+  }
+
   return passwordVal;
 }
